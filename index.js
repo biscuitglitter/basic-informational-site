@@ -1,25 +1,21 @@
-const http = require("http");
-const fs = require("fs");
-const url = require("url");
+const express = require("express");
+const path = require("path");
 
-http.createServer((req, res) => {
-    const q = url.parse(req.url, true);
-    const filename = q.pathname === "/" ? `./index.html` : `.${q.pathname}.html`
-    console.log(q.pathname)
-    console.log(filename)
-    fs.readFile(filename, (err, data) => {
-        if (err) {
-            res.writeHead(404, {"Content-Type": "text/html"})
-            res.write(fs.readFileSync("404.html" , (err, data) => {
-                if (err) throw err;
-                return data;
-            }))
-            return res.end();
-        } 
-        res.writeHead(200, {"Content-Type": "text/html" })
-        res.write(data);
-        return res.end();        
-    })
-}).listen(8080);
-console.log(`server running in port 8080`)
+const app = express();
+const port = process.env.PORT || 8080;
 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "/index.html"));
+  });
+app.get("/about", (req, res) => {
+    res.sendFile(path.join(__dirname, "/about.html"));
+  });
+app.get("/contact-me", (req, res) => {
+    res.sendFile(path.join(__dirname, "/contact-me.html"));
+});
+app.get("/:id", (req, res) => {
+    res.sendFile(path.join(__dirname, "/404.html"));
+});
+// id slash route should be last because express runs all code in order
+app.listen(port, () => {
+});
